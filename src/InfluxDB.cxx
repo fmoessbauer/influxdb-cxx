@@ -42,12 +42,10 @@
 namespace influxdb
 {
 
-InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
-  mLineProtocolBatch{},
-  mIsBatchingActivated{false},
+InfluxDB::InfluxDB(std::unique_ptr<Transport> transport)
+  : mIsBatchingActivated{false},
   mBatchSize{0},
-  mTransport(std::move(transport)),
-  mGlobalTags{}
+  mTransport(std::move(transport))
 {
 }
 
@@ -68,34 +66,17 @@ void InfluxDB::batchOf(const std::size_t size)
 
 void InfluxDB::flushBatch()
 {
-  if (!mIsBatchingActivated || mLineProtocolBatch.empty())
+  if (!mIsBatchingActivated || mBatchedPoints.empty())
   {
     return;
   }
 
-  transmit(joinLineProtocolBatch());
-  mLineProtocolBatch.clear();
-}
-
-
-std::string InfluxDB::joinLineProtocolBatch() const
-{
-  std::string joinedBatch;
-  for (const auto &line : mLineProtocolBatch)
-  {
-    joinedBatch += line + "\n";
+  LineSerializerV1 v1serial;
+  for(const auto & p : mBatchedPoints){
+    v1serial.append(p);
   }
-  return joinedBatch;
-}
-
-
-void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
-{
-  if (!mGlobalTags.empty())
-  { mGlobalTags += ","; }
-  mGlobalTags += key;
-  mGlobalTags += "=";
-  mGlobalTags += value;
+  transmit(v1serial.finalize_buffer());
+  mBatchedPoints.clear();
 }
 
 void InfluxDB::transmit(std::string &&point)
@@ -103,53 +84,48 @@ void InfluxDB::transmit(std::string &&point)
   mTransport->send(std::move(point));
 }
 
-void InfluxDB::write(Point &&point)
+void InfluxDB::write(Point && point)
 {
   if (mIsBatchingActivated)
   {
-    addPointToBatch(point);
+    mBatchedPoints.emplace_back(point);
+    if(mBatchedPoints.size() >= mBatchSize)
+      flushBatch();
   }
   else
   {
-    // TODO
-    //transmit(point.toLineProtocol());
+    LineSerializerV1 v1serial;
+    v1serial.append(point);
+    transmit(std::move(v1serial.finalize_buffer()));
   }
 }
 
-void InfluxDB::write(std::vector<Point> &&points)
+void InfluxDB::write(std::vector<Point> && points)
 {
   if (mIsBatchingActivated)
   {
-    for (const auto &point : points)
+    for (auto &&point : points)
     {
-      addPointToBatch(point);
+      addPointToBatch(std::move(point));
     }
   }
   else
   {
-    #if 0
-    std::string lineProtocol;
+    LineSerializerV1 v1serial;
     for (const auto &point : points)
     {
-      // TODO
-      //lineProtocol += point.toLineProtocol() + "\n";
+      v1serial.append(point);
     }
-    transmit(std::move(lineProtocol));
-    #endif
+    transmit(std::move(v1serial.finalize_buffer()));
   }
 }
 
-void InfluxDB::addPointToBatch(const Point &point)
+void InfluxDB::addPointToBatch(Point &&point)
 {
-  point.getFieldsView();
-  // TODO
-  #if 0
-  mLineProtocolBatch.emplace_back(point.toLineProtocol());
-  if (mLineProtocolBatch.size() >= mBatchSize)
-  {
+  mBatchedPoints.emplace_back(std::move(point));
+  if(mBatchedPoints.size() > mBatchSize){
     flushBatch();
   }
-  #endif
 }
 
 #ifdef INFLUXDB_WITH_BOOST

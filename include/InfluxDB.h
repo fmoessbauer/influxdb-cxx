@@ -35,6 +35,7 @@
 
 #include "Transport.h"
 #include "Point.h"
+#include "LineSerializerV1.h"
 
 namespace influxdb
 {
@@ -81,17 +82,15 @@ class InfluxDB
     /// \param size
     void batchOf(const std::size_t size = 32);
 
-    /// Adds a global tag
-    /// \param name
-    /// \param value
-    void addGlobalTag(std::string_view name, std::string_view value);
+    /// Transmits string over transport
+    void transmit(std::string&& point);
 
 private:
-    void addPointToBatch(const Point &point);
+    void addPointToBatch(Point &&point);
 
   private:
-    /// line protocol batch to be writen
-    std::deque<std::string> mLineProtocolBatch;
+    /// all points of the current batch
+    std::vector<Point> mBatchedPoints;
 
     /// Flag stating whether point buffering is enabled
     bool mIsBatchingActivated;
@@ -102,14 +101,6 @@ private:
     /// Underlying transport UDP/HTTP/Unix socket
     std::unique_ptr<Transport> mTransport;
 
-    /// Transmits string over transport
-    void transmit(std::string&& point);
-
-    /// List of global tags
-    std::string mGlobalTags;
-
-
-  std::string joinLineProtocolBatch() const;
 };
 
 } // namespace influxdb

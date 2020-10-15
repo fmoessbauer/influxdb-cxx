@@ -1,6 +1,7 @@
 add_library(InfluxDB
   InfluxDB.cxx
   Point.cxx
+  LineSerializerV1.cxx
   InfluxDBFactory.cxx
   $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
   $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>

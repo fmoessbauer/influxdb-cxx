@@ -29,7 +29,7 @@
 
 #include <string>
 #include <string_view>
-#include <vector>
+#include <unordered_map>
 #include <chrono>
 #include <variant>
 
@@ -40,20 +40,16 @@ namespace influxdb
 class Point
 {
 public:
-    using FieldValue = std::variant<int, long long int, std::string, double>;
+    using FieldValue = std::variant<int, long long int, std::string, double, bool>;
     using FieldItem = std::pair<std::string, FieldValue>;
-    using FieldContainer = std::vector<FieldItem>;
-    using FieldsView = std::pair<FieldContainer::const_iterator, FieldContainer::const_iterator>;
+    using FieldContainer = std::unordered_map<std::string, FieldValue>;
 
-    using TagContainer = std::vector<std::pair<std::string, std::string>>;
-    using TagsView = std::pair<TagContainer::const_iterator, TagContainer::const_iterator>;
+    using TagContainer = std::unordered_map<std::string, std::string>;
     using TimePoint = decltype(std::chrono::system_clock::now());
 
 public:
   /// Constructs point based on measurement name
-    template <typename TimePointT>
-    explicit Point(std::string_view measurement,
-                   TimePointT tp = getCurrentTimestamp())
+    explicit Point(std::string_view measurement, TimePoint tp = getCurrentTimestamp())
         : mValue({}),
           mMeasurement(measurement),
           mTimestamp(tp),
@@ -71,21 +67,16 @@ public:
     Point&& addField(std::string_view name, const FieldValue& value);
 
     /// Sets custom timestamp
-    template <typename TimePointT>
-    Point&& setTimestamp(TimePointT timestamp)
-    {
-        mTimestamp = timestamp;
-        return std::move(*this);
-    }
+    Point&& setTimestamp(TimePoint timestamp);
 
     /// Name getter
     std::string getName() const;
 
     /// View to fields
-    FieldsView getFieldsView() const;
+    FieldContainer getFields() const;
 
     /// View to tags
-    TagsView getTagsView() const;
+    TagContainer getTags() const;
 
     /// Timestamp getter
     TimePoint getTimestamp() const;
