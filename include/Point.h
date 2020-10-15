@@ -28,20 +28,36 @@
 #define INFLUXDATA_POINT_H
 
 #include <string>
+#include <vector>
 #include <chrono>
 #include <variant>
 
 namespace influxdb
 {
 
-static inline constexpr int defaultFloatsPrecision{18};
-
 /// \brief Represents a point
 class Point
 {
-  public:
-    /// Constructs point based on measurement name
-    Point(const std::string& measurement);
+public:
+    using FieldValue = std::variant<int, long long int, std::string, double>;
+    using FieldContainer = std::vector<FieldValue>;
+    using FieldsView = std::pair<FieldContainer::const_iterator, FieldContainer::const_iterator>;
+    using TagContainer = std::vector<std::string>;
+    using TagsView = std::pair<TagContainer::const_iterator, TagContainer::const_iterator>;
+    using TimePoint = decltype(std::chrono::system_clock::now());
+
+public:
+  /// Constructs point based on measurement name
+    template <typename TimePointT>
+    explicit Point(std::string_view measurement,
+                   TimePointT tp = getCurrentTimestamp())
+        : mValue({}),
+          mMeasurement(measurement),
+          mTimestamp(
+              std::chrono::time_point_cast<TimePoint>(tp)),
+          mTags({}), mFields({})
+    {
+    }
 
     /// Default destructor
     ~Point() = default;
@@ -50,31 +66,31 @@ class Point
     Point&& addTag(std::string_view key, std::string_view value);
 
     /// Adds filed
-    Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
-
-    /// Generetes current timestamp
-    static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
-
-    /// Converts point to Influx Line Protocol
-    std::string toLineProtocol() const;
+    Point&& addField(std::string_view name, const FieldValue& value);
 
     /// Sets custom timestamp
-    Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
+    template <typename TimePointT>
+    Point&& setTimestamp(TimePointT timestamp)
+    {
+        mTimestamp = std::chrono::time_point_cast<TimePoint>(timestamp);
+        return std::move(*this);
+    }
 
     /// Name getter
     std::string getName() const;
 
+    /// View to fields
+    FieldsView getFieldsView() const;
+
+    /// View to tags
+    TagsView getTagsView() const;
+
     /// Timestamp getter
-    std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
+    TimePoint getTimestamp() const;
 
-    /// Fields getter
-    std::string getFields() const;
-
-    /// Tags getter
-    std::string getTags() const;
-
-    /// Precision for float fields
-    static inline int floatsPrecision{defaultFloatsPrecision};
+private:
+    /// Generetes current timestamp
+    static TimePoint getCurrentTimestamp();
 
 protected:
     /// A value
@@ -84,16 +100,15 @@ protected:
     std::string mMeasurement;
 
     /// A timestamp
-    std::chrono::time_point<std::chrono::system_clock> mTimestamp;
+    TimePoint mTimestamp;
 
     /// Tags
-    std::string mTags;
+    TagContainer mTags;
 
     /// Fields
-    std::string mFields;
-
+    FieldContainer mFields;
 };
-
+  
 } // namespace influxdb
 
 #endif // INFLUXDATA_POINT_H

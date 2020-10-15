@@ -38,18 +38,17 @@ namespace influxdb
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-Point::Point(const std::string& measurement) : mValue({}),
-  mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp()), mTags({}), mFields({})
-{
-}
-
 Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value)
 {
   if (name.empty())
   {
+    // TODO: why? better throw exeption
     return std::move(*this);
   }
 
+  mFields.emplace_back(name, value);
+  #if 0
+  /** TODO: refactor */
   std::stringstream convert;
   convert << std::setprecision(floatsPrecision);
   if (!mFields.empty()) convert << ",";
@@ -62,6 +61,7 @@ Point&& Point::addField(std::string_view name, const std::variant<int, long long
     [&convert](const std::string& v) { convert << '"' << v << '"'; },
     }, value);
   mFields += convert.str();
+  #endif
   return std::move(*this);
 }
 
@@ -69,51 +69,50 @@ Point&& Point::addTag(std::string_view key, std::string_view value)
 {
   if (value.empty())
   {
+    // TODO: why? better throw exeption
     return std::move(*this);
   }
+  mTags.emplace_back(key, value);
+  #if 0
   mTags += ",";
   mTags += key;
   mTags += "=";
   mTags += value;
+  #endif
   return std::move(*this);
 }
 
-Point&& Point::setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp)
-{
-  mTimestamp = timestamp;
-  return std::move(*this);
-}
-
-auto Point::getCurrentTimestamp() -> decltype(std::chrono::system_clock::now())
-{
-  return std::chrono::system_clock::now();
-}
-
+#if 0
 std::string Point::toLineProtocol() const
 {
   return mMeasurement + mTags + " " + mFields + " " + std::to_string(
     std::chrono::duration_cast <std::chrono::nanoseconds>(mTimestamp.time_since_epoch()).count()
   );
 }
+#endif
 
 std::string Point::getName() const
 {
   return mMeasurement;
 }
 
-std::chrono::time_point<std::chrono::system_clock> Point::getTimestamp() const
+Point::TimePoint Point::getTimestamp() const
 {
   return mTimestamp;
 }
 
-std::string Point::getFields() const
+Point::FieldsView Point::getFieldsView() const
 {
-  return mFields;
+  return {mFields.cbegin(), mFields.cend()};
 }
 
-std::string Point::getTags() const
+Point::TagsView Point::getTagsView() const
 {
-  return mTags.substr(1, mTags.size());
+  return {mTags.cbegin(), mTags.cend()};
+}
+
+Point::TimePoint Point::getCurrentTimestamp(){
+  return std::chrono::time_point_cast<TimePoint>(std::chrono::system_clock::now());
 }
 
 } // namespace influxdb
