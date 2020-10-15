@@ -9,12 +9,12 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 namespace influxdb
 {
-    void LineSerializerV1::append(const Point& point)
+    void LineSerializerV1::visit(const Point& point)
     {
         const auto ns_since_epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch());
-        lineBuffer += point.getName();
-        append(point.getTags());
-        append(point.getFields());
+        lineBuffer += point.viewName();
+        append(point.viewTags());
+        append(point.viewFields());
         lineBuffer += " " + std::to_string(ns_since_epoch.count());
         lineBuffer += '\n';
     }

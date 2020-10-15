@@ -7,7 +7,7 @@ namespace influxdb
     class LineSerializerV1
     {
     public:
-        void append(const Point& point);
+        void visit(const Point& point);
         std::string&& finalize_buffer();
 
     private:

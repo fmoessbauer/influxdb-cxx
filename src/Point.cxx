@@ -63,7 +63,7 @@ namespace influxdb
         return std::move(*this);
     }
 
-    std::string Point::getName() const
+    std::string_view Point::viewName() const
     {
         return mMeasurement;
     }
@@ -73,12 +73,12 @@ namespace influxdb
         return mTimestamp;
     }
 
-    Point::FieldContainer Point::getFields() const
+    const Point::FieldContainer & Point::viewFields() const
     {
         return mFields;
     }
 
-    Point::TagContainer Point::getTags() const
+    const Point::TagContainer & Point::viewTags() const
     {
         return mTags;
     }

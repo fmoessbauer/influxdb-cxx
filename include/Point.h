@@ -69,16 +69,21 @@ public:
     Point&& setTimestamp(TimePoint timestamp);
 
     /// Name getter
-    std::string getName() const;
+    std::string_view viewName() const;
 
     /// View to fields
-    FieldContainer getFields() const;
+    const FieldContainer & viewFields() const;
 
     /// View to tags
-    TagContainer getTags() const;
+    const TagContainer & viewTags() const;
 
     /// Timestamp getter
     TimePoint getTimestamp() const;
+
+    template<typename Visitor>
+    void accept(Visitor & visitor) const {
+        visitor.visit(*this);
+    }
 
 private:
     /// Generetes current timestamp

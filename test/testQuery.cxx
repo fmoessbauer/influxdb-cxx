@@ -49,15 +49,15 @@ BOOST_AUTO_TEST_CASE(query1)
   // so all point fields are treated as double fields. It makes necessary to adapt Point precision of float fields
   // or consider default number of decimal digits at the checking
   BOOST_CHECK_EQUAL(points.size(), 3);
-  BOOST_CHECK_EQUAL(points[0].getName(), "query1");
-  BOOST_CHECK_EQUAL(points[1].getName(), "query1");
-  BOOST_CHECK_EQUAL(points[2].getName(), "query1");
-  BOOST_CHECK_CLOSE(std::get<double>(points[0].getFields().at("value")), 200.0, 1e-6);
-  BOOST_CHECK_CLOSE(std::get<double>(points[1].getFields()["value"]), 20.0, 1e-6);
-  BOOST_CHECK_CLOSE(std::get<double>(points[2].getFields()["value"]), 10.0, 1e-6);
-  BOOST_CHECK_EQUAL(points[0].getTags().at("host"), "localhost");
-  BOOST_CHECK_EQUAL(points[1].getTags().at("host"), "localhost");
-  BOOST_CHECK_EQUAL(points[2].getTags().at("host"), "localhost");
+  BOOST_CHECK_EQUAL(points[0].viewName(), "query1");
+  BOOST_CHECK_EQUAL(points[1].viewName(), "query1");
+  BOOST_CHECK_EQUAL(points[2].viewName(), "query1");
+  BOOST_CHECK_CLOSE(std::get<double>(points[0].viewFields().at("value")), 200.0, 1e-6);
+  BOOST_CHECK_CLOSE(std::get<double>(points[1].viewFields().at("value")), 20.0, 1e-6);
+  BOOST_CHECK_CLOSE(std::get<double>(points[2].viewFields().at("value")), 10.0, 1e-6);
+  BOOST_CHECK_EQUAL(points[0].viewTags().at("host"), "localhost");
+  BOOST_CHECK_EQUAL(points[1].viewTags().at("host"), "localhost");
+  BOOST_CHECK_EQUAL(points[2].viewTags().at("host"), "localhost");
 }
 
 BOOST_AUTO_TEST_CASE(timeStampVerify)

@@ -73,7 +73,7 @@ void InfluxDB::flushBatch()
 
   LineSerializerV1 v1serial;
   for(const auto & p : mBatchedPoints){
-    v1serial.append(p);
+    p.accept(v1serial);
   }
   transmit(v1serial.finalize_buffer());
   mBatchedPoints.clear();
@@ -95,7 +95,7 @@ void InfluxDB::write(Point && point)
   else
   {
     LineSerializerV1 v1serial;
-    v1serial.append(point);
+    point.accept(v1serial);
     transmit(std::move(v1serial.finalize_buffer()));
   }
 }
@@ -114,7 +114,7 @@ void InfluxDB::write(std::vector<Point> && points)
     LineSerializerV1 v1serial;
     for (const auto &point : points)
     {
-      v1serial.append(point);
+      point.accept(v1serial);
     }
     transmit(std::move(v1serial.finalize_buffer()));
   }
