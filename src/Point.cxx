@@ -35,6 +35,16 @@
 
 namespace influxdb
 {
+    Point::Point(std::string_view measurement, std::pmr::memory_resource* pool)
+        : Point(measurement, getCurrentTimestamp(), pool) { }
+
+    Point::Point(std::string_view measurement, TimePoint tp, std::pmr::memory_resource * pool)
+        : mMeasurement(measurement, pool),
+          mTimestamp(tp),
+          mTags(pool), mFields(pool)
+    {
+    }
+
     Point&& Point::addField(std::string_view name, const Point::FieldValue& value)
     {
         if (name.empty() || value.valueless_by_exception())

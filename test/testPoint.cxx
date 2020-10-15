@@ -91,8 +91,7 @@ BOOST_AUTO_TEST_CASE(test4)
 BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
 {
   auto point = Point{"test"};
-  auto predicate = [](const InvalidData & ){return true;};
-  BOOST_CHECK_EXCEPTION(point.addField("", 10), InvalidData, predicate);
+  BOOST_REQUIRE_THROW(point.addField("", 10), InvalidData);
 
   BOOST_CHECK_EQUAL(point.viewFields().size(), 0);
 }

@@ -1,6 +1,7 @@
   set(TEST_SRCS
     testUdp.cxx
     testPoint.cxx
+    testPmrPoint.cxx
     testHttp.cxx
     testQuery.cxx
     testFactory.cxx

@@ -32,6 +32,7 @@
 #include <map>
 #include <chrono>
 #include <variant>
+#include <memory_resource>
 
 namespace influxdb
 {
@@ -41,20 +42,20 @@ class Point
 {
 public:
     using FieldValue = std::variant<int, long long int, std::string, double, bool>;
-    using FieldItem = std::pair<std::string, FieldValue>;
-    using FieldContainer = std::map<std::string, FieldValue>;
+    using FieldContainer = std::pmr::map<std::pmr::string, FieldValue>;
 
-    using TagContainer = std::map<std::string, std::string>;
+    using TagContainer = std::pmr::map<std::pmr::string, std::pmr::string>;
     using TimePoint = decltype(std::chrono::system_clock::now());
 
 public:
-  /// Constructs point based on measurement name
-    explicit Point(std::string_view measurement, TimePoint tp = getCurrentTimestamp())
-        : mMeasurement(measurement),
-          mTimestamp(tp),
-          mTags({}), mFields({})
-    {
-    }
+    
+    /// Constructs point based on measurement name and pool
+    explicit Point(std::string_view measurement, std::pmr::memory_resource* pool);
+
+    /// Constructs point based on measurement name
+    explicit Point(std::string_view measurement,
+        TimePoint tp = getCurrentTimestamp(),
+        std::pmr::memory_resource* pool = std::pmr::get_default_resource());
 
     /// Default destructor
     ~Point() = default;
@@ -68,7 +69,7 @@ public:
     /// Sets custom timestamp
     Point&& setTimestamp(TimePoint timestamp);
 
-    /// Name getter
+    /// View to measurement name
     std::string_view viewName() const;
 
     /// View to fields
@@ -80,6 +81,7 @@ public:
     /// Timestamp getter
     TimePoint getTimestamp() const;
 
+    /// visitor entry
     template<typename Visitor>
     void accept(Visitor & visitor) const {
         visitor.visit(*this);
@@ -91,7 +93,7 @@ private:
 
 protected:
     /// A name
-    std::string mMeasurement;
+    std::pmr::string mMeasurement;
 
     /// A timestamp
     TimePoint mTimestamp;
