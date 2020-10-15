@@ -35,10 +35,10 @@
 namespace influxdb
 {
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+//template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+//template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value)
+Point&& Point::addField(std::string_view name, const Point::FieldValue & value)
 {
   if (name.empty())
   {
@@ -112,7 +112,7 @@ Point::TagsView Point::getTagsView() const
 }
 
 Point::TimePoint Point::getCurrentTimestamp(){
-  return std::chrono::time_point_cast<TimePoint>(std::chrono::system_clock::now());
+  return std::chrono::system_clock::now();
 }
 
 } // namespace influxdb

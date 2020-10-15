@@ -28,6 +28,7 @@
 #define INFLUXDATA_POINT_H
 
 #include <string>
+#include <string_view>
 #include <vector>
 #include <chrono>
 #include <variant>
@@ -40,9 +41,11 @@ class Point
 {
 public:
     using FieldValue = std::variant<int, long long int, std::string, double>;
-    using FieldContainer = std::vector<FieldValue>;
+    using FieldItem = std::pair<std::string, FieldValue>;
+    using FieldContainer = std::vector<FieldItem>;
     using FieldsView = std::pair<FieldContainer::const_iterator, FieldContainer::const_iterator>;
-    using TagContainer = std::vector<std::string>;
+
+    using TagContainer = std::vector<std::pair<std::string, std::string>>;
     using TagsView = std::pair<TagContainer::const_iterator, TagContainer::const_iterator>;
     using TimePoint = decltype(std::chrono::system_clock::now());
 
@@ -53,8 +56,7 @@ public:
                    TimePointT tp = getCurrentTimestamp())
         : mValue({}),
           mMeasurement(measurement),
-          mTimestamp(
-              std::chrono::time_point_cast<TimePoint>(tp)),
+          mTimestamp(tp),
           mTags({}), mFields({})
     {
     }
@@ -65,14 +67,14 @@ public:
     /// Adds a tags
     Point&& addTag(std::string_view key, std::string_view value);
 
-    /// Adds filed
+    /// Adds field
     Point&& addField(std::string_view name, const FieldValue& value);
 
     /// Sets custom timestamp
     template <typename TimePointT>
     Point&& setTimestamp(TimePointT timestamp)
     {
-        mTimestamp = std::chrono::time_point_cast<TimePoint>(timestamp);
+        mTimestamp = timestamp;
         return std::move(*this);
     }
 
