@@ -55,7 +55,12 @@ public:
 
 class ConnectionError : public InfluxDBException {
 public:
-  ConnectionError(const std::string &source, const std::string &message) : InfluxDBException(source, message) {};
+  ConnectionError(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
+};
+
+class InvalidData : public InfluxDBException {
+public:
+  InvalidData(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
 };
 
 

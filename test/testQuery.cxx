@@ -52,12 +52,12 @@ BOOST_AUTO_TEST_CASE(query1)
   BOOST_CHECK_EQUAL(points[0].getName(), "query1");
   BOOST_CHECK_EQUAL(points[1].getName(), "query1");
   BOOST_CHECK_EQUAL(points[2].getName(), "query1");
-  //BOOST_CHECK_EQUAL(points[0].getFields()["value"], 200);
-  //BOOST_CHECK_EQUAL(points[1].getFields()["value"], 200);
-  //BOOST_CHECK_EQUAL(points[2].getFields()["value"], 10);
-  //BOOST_CHECK_EQUAL(points[0].getTags()["host"], "localhost");
-  //BOOST_CHECK_EQUAL(points[1].getTags()["host"], "localhost");
-  //BOOST_CHECK_EQUAL(points[2].getTags()["host"], "localhost");
+  BOOST_CHECK_CLOSE(std::get<double>(points[0].getFields().at("value")), 200.0, 1e-6);
+  BOOST_CHECK_CLOSE(std::get<double>(points[1].getFields()["value"]), 20.0, 1e-6);
+  BOOST_CHECK_CLOSE(std::get<double>(points[2].getFields()["value"]), 10.0, 1e-6);
+  BOOST_CHECK_EQUAL(points[0].getTags().at("host"), "localhost");
+  BOOST_CHECK_EQUAL(points[1].getTags().at("host"), "localhost");
+  BOOST_CHECK_EQUAL(points[2].getTags().at("host"), "localhost");
 }
 
 BOOST_AUTO_TEST_CASE(timeStampVerify)

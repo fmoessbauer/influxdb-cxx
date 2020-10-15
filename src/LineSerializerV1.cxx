@@ -1,6 +1,5 @@
 #include "LineSerializerV1.h"
 #include "Point.h"
-#include <iostream>
 #include <chrono>
 
 // clang-format off
@@ -21,7 +20,6 @@ namespace influxdb
     }
     std::string&& LineSerializerV1::finalize_buffer()
     {
-        std::cout << lineBuffer;
         return std::move(lineBuffer);
     }
 

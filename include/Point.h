@@ -29,7 +29,7 @@
 
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <map>
 #include <chrono>
 #include <variant>
 
@@ -42,16 +42,15 @@ class Point
 public:
     using FieldValue = std::variant<int, long long int, std::string, double, bool>;
     using FieldItem = std::pair<std::string, FieldValue>;
-    using FieldContainer = std::unordered_map<std::string, FieldValue>;
+    using FieldContainer = std::map<std::string, FieldValue>;
 
-    using TagContainer = std::unordered_map<std::string, std::string>;
+    using TagContainer = std::map<std::string, std::string>;
     using TimePoint = decltype(std::chrono::system_clock::now());
 
 public:
   /// Constructs point based on measurement name
     explicit Point(std::string_view measurement, TimePoint tp = getCurrentTimestamp())
-        : mValue({}),
-          mMeasurement(measurement),
+        : mMeasurement(measurement),
           mTimestamp(tp),
           mTags({}), mFields({})
     {
@@ -86,9 +85,6 @@ private:
     static TimePoint getCurrentTimestamp();
 
 protected:
-    /// A value
-    std::variant<long long int, std::string, double> mValue;
-
     /// A name
     std::string mMeasurement;
 

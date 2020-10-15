@@ -25,6 +25,7 @@
 ///
 
 #include "Point.h"
+#include "InfluxDBException.h"
 
 #include <iostream>
 #include <chrono>
@@ -36,45 +37,23 @@ namespace influxdb
 {
     Point&& Point::addField(std::string_view name, const Point::FieldValue& value)
     {
-        if (name.empty())
+        if (name.empty() || value.valueless_by_exception())
         {
-            // TODO: why? better throw exeption
-            return std::move(*this);
+            throw InvalidData(__func__, "field name or value invalid");
         }
-
         mFields.emplace(name, value);
-#if 0
-  /** TODO: refactor */
-  std::stringstream convert;
-  convert << std::setprecision(floatsPrecision);
-  if (!mFields.empty()) convert << ",";
-
-  convert << name << "=";
-  std::visit(overloaded {
-    [&convert](int v) { convert << v << 'i'; },
-    [&convert](long long int v) { convert << v << 'i'; },
-    [&convert](double v) { convert  << std::fixed << v; },
-    [&convert](const std::string& v) { convert << '"' << v << '"'; },
-    }, value);
-  mFields += convert.str();
-#endif
         return std::move(*this);
     }
 
     Point&& Point::addTag(std::string_view key, std::string_view value)
     {
-        if (value.empty())
+        if (key.empty())
         {
-            // TODO: why? better throw exeption
-            return std::move(*this);
+            throw InvalidData(__func__, "key empty");
         }
-        mTags.emplace(key, value);
-#if 0
-  mTags += ",";
-  mTags += key;
-  mTags += "=";
-  mTags += value;
-#endif
+        if(!value.empty()){
+            mTags.emplace(key, value);
+        }
         return std::move(*this);
     }
 

@@ -25,6 +25,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "InfluxDBFactory.h"
+#include "InfluxDBException.h"
 #include <iterator>
 
 namespace influxdb::test {
@@ -58,7 +59,8 @@ BOOST_AUTO_TEST_CASE(test2)
   auto result = getVector(point);
 
   BOOST_CHECK_EQUAL(result[0], "test");
-  BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
+  // TODO: refactor this check after precision is implemented
+  BOOST_CHECK_EQUAL(result[1], "dvalue="+std::to_string(10.1)+",value=10i");
 }
 
 BOOST_AUTO_TEST_CASE(test3)
@@ -71,7 +73,8 @@ BOOST_AUTO_TEST_CASE(test3)
   auto result = getVector(point);
 
   BOOST_CHECK_EQUAL(result[0], "test,tag=tagval");
-  BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
+  // TODO: refactor this check after precision is implemented
+  BOOST_CHECK_EQUAL(result[1], "dvalue="+std::to_string(10.1)+",value=10i");
 }
 
 BOOST_AUTO_TEST_CASE(test4)
@@ -87,7 +90,9 @@ BOOST_AUTO_TEST_CASE(test4)
 
 BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
 {
-  auto point = Point{"test"}.addField("", 10);
+  auto point = Point{"test"};
+  auto predicate = [](const InvalidData & ){return true;};
+  BOOST_CHECK_EXCEPTION(point.addField("", 10), InvalidData, predicate);
 
   BOOST_CHECK_EQUAL(point.getFields().size(), 0);
 }

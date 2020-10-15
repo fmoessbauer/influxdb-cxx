@@ -138,7 +138,7 @@ std::vector<Point> InfluxDB::query(const std::string &query)
   std::vector<Point> points;
   boost::property_tree::ptree pt;
   boost::property_tree::read_json(responseString, pt);
-#if 0
+
   for (auto &result : pt.get_child("results"))
   {
     auto isResultEmpty = result.second.find("series");
@@ -176,7 +176,6 @@ std::vector<Point> InfluxDB::query(const std::string &query)
       }
     }
   }
-#endif
   return points;
 }
 
