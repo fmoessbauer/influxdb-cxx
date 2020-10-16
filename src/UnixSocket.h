@@ -42,7 +42,7 @@ class UnixSocket : public Transport
     explicit UnixSocket(const std::string &socketPath);
 
     /// \param message   r-value string formated
-    void send(std::string&& message) override;
+    void send(std::string_view message) override;
 
   private:
     /// Boost Asio I/O functionality

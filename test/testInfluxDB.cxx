@@ -38,7 +38,7 @@ namespace influxdb::test
         class WriteRecorder
         {
         public:
-            void record([[maybe_unused]] std::string message)
+            void record([[maybe_unused]] std::string_view message)
             {
                 ++calls;
             }
@@ -60,7 +60,7 @@ namespace influxdb::test
             {
             }
 
-            void send(std::string&& message) override
+            void send(std::string_view message) override
             {
                 recorder->record(message);
             }
@@ -164,7 +164,7 @@ namespace influxdb::test
     BOOST_AUTO_TEST_CASE(pointsWrittenAsBatchAreTransmittedInBatchesSpecified)
     {
         auto recorder = std::make_shared<WriteRecorder>();
-        InfluxDB db{std::make_unique<TransportAdapter>(recorder)};
+        InfluxDB db{std::make_unique<TransportAdapter>(recorder), std::make_unique<LineSerializerV1>()};
         db.batchOf(2);
 
         db.write(Point{"batch_point"}.addField("value", 0).addTag("host", "localhost"));

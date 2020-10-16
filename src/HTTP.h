@@ -47,7 +47,7 @@ public:
 
   /// Sends point via HTTP POST
   ///  \throw InfluxDBException	when CURL fails on POSTing or response code != 200
-  void send(std::string &&lineprotocol) override;
+  void send(std::string_view lineprotocol) override;
 
   /// Queries database
   /// \throw InfluxDBException	when CURL GET fails

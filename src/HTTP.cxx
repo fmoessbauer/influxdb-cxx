@@ -151,11 +151,11 @@ void HTTP::enableBasicAuth(const std::string &auth)
   curl_easy_setopt(readHandle, CURLOPT_USERPWD, auth.c_str());
 }
 
-void HTTP::send(std::string &&lineprotocol)
+void HTTP::send(std::string_view lineprotocol)
 {
   CURLcode response;
   long responseCode;
-  curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.c_str());
+  curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.data());
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(lineprotocol.length()));
   response = curl_easy_perform(writeHandle);
   curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);

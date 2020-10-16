@@ -42,7 +42,7 @@ class Transport
     virtual ~Transport() = default;
 
     /// Sends string blob
-    virtual void send(std::string&& message) = 0;
+    virtual void send(std::string_view message) = 0;
 
     /// Sends request
     virtual std::string query(const std::string& /*query*/) {

@@ -40,7 +40,7 @@ UDP::UDP(const std::string &hostname, int port) :
   mEndpoint = *resolverInerator;
 }
 
-void UDP::send(std::string &&message)
+void UDP::send(std::string_view message)
 {
   try
   {

@@ -44,7 +44,7 @@ class UDP : public Transport
     UDP(const std::string &hostname, int port);
 
     /// Sends blob via UDP
-    void send(std::string&& message) override;
+    void send(std::string_view message) override;
 
   private:
     /// Boost Asio I/O functionality

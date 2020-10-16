@@ -42,90 +42,43 @@
 namespace influxdb
 {
 
-InfluxDB::InfluxDB(std::unique_ptr<Transport> transport)
-  : mIsBatchingActivated{false},
-  mBatchSize{0},
-  mTransport(std::move(transport))
+InfluxDB::InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializerV1> serializer)
+  : mBatchMaxSize{1},
+  mBatchCurSize{0},
+  mTransport(std::move(transport)),
+  v1serial(std::move(serializer))
 {
 }
 
 InfluxDB::~InfluxDB()
 {
-  if (!mIsBatchingActivated)
+  if (mBatchCurSize > 0)
   {
-    return;
+    flushBatch();
   }
-  flushBatch();
-}
-
-void InfluxDB::batchOf(const std::size_t size)
-{
-  mBatchSize = size;
-  mIsBatchingActivated = true;
 }
 
 void InfluxDB::flushBatch()
 {
-  if (!mIsBatchingActivated || mBatchedPoints.empty())
+  if (mBatchCurSize > 0)
   {
-    return;
+    transmit(v1serial->finalize_buffer());
+    v1serial->reset();
+    mBatchCurSize = 0;
   }
-
-  LineSerializerV1 v1serial;
-  for(const auto & p : mBatchedPoints){
-    p.accept(v1serial);
-  }
-  transmit(v1serial.finalize_buffer());
-  mBatchedPoints.clear();
 }
 
-void InfluxDB::transmit(std::string &&point)
+void InfluxDB::transmit(std::string_view serializedBatch)
 {
-  mTransport->send(std::move(point));
+  mTransport->send(std::move(serializedBatch));
 }
 
 void InfluxDB::write(Point && point)
 {
-  if (mIsBatchingActivated)
-  {
-    mBatchedPoints.emplace_back(point);
-    if(mBatchedPoints.size() >= mBatchSize)
+    point.accept(*v1serial);
+    if(++mBatchCurSize >= mBatchMaxSize){
       flushBatch();
-  }
-  else
-  {
-    LineSerializerV1 v1serial;
-    point.accept(v1serial);
-    transmit(std::move(v1serial.finalize_buffer()));
-  }
-}
-
-void InfluxDB::write(std::vector<Point> && points)
-{
-  if (mIsBatchingActivated)
-  {
-    for (auto &&point : points)
-    {
-      addPointToBatch(std::move(point));
     }
-  }
-  else
-  {
-    LineSerializerV1 v1serial;
-    for (const auto &point : points)
-    {
-      point.accept(v1serial);
-    }
-    transmit(std::move(v1serial.finalize_buffer()));
-  }
-}
-
-void InfluxDB::addPointToBatch(Point &&point)
-{
-  mBatchedPoints.emplace_back(std::move(point));
-  if(mBatchedPoints.size() > mBatchSize){
-    flushBatch();
-  }
 }
 
 #ifdef INFLUXDB_WITH_BOOST

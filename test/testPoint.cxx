@@ -34,7 +34,10 @@ std::vector<std::string> getVector(const Point& point)
 {
   LineSerializerV1 v1serial;
   point.accept(v1serial);
-  std::istringstream result(v1serial.finalize_buffer());
+  // TODO: refactor
+  std::string_view view = v1serial.finalize_buffer();
+  std::istringstream result(std::string(view), std::ios_base::in);
+
   return std::vector<std::string>{std::istream_iterator<std::string>{result},
                       std::istream_iterator<std::string>{}};
 }

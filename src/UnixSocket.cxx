@@ -38,7 +38,7 @@ UnixSocket::UnixSocket(const std::string &socketPath) :
   mSocket.open();
 }
 
-void UnixSocket::send(std::string &&message)
+void UnixSocket::send(std::string_view message)
 {
   try
   {

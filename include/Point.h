@@ -47,15 +47,31 @@ public:
     using TagContainer = std::pmr::map<std::pmr::string, std::pmr::string>;
     using TimePoint = decltype(std::chrono::system_clock::now());
 
+    using allocator_type = std::pmr::polymorphic_allocator<char>;
+
 public:
     
     /// Constructs point based on measurement name and pool
-    explicit Point(std::string_view measurement, std::pmr::memory_resource* pool);
+    explicit Point(std::string_view measurement, const allocator_type & alloc);
 
     /// Constructs point based on measurement name
     explicit Point(std::string_view measurement,
         TimePoint tp = getCurrentTimestamp(),
-        std::pmr::memory_resource* pool = std::pmr::get_default_resource());
+        const allocator_type & alloc = {});
+
+    /// Copy constructor with allocator support
+    Point(const Point& other, const allocator_type& alloc) 
+    : mMeasurement{other.mMeasurement, alloc},
+      mTimestamp{other.mTimestamp},
+      mTags{other.mTags, alloc},
+      mFields{other.mFields, alloc} { }
+
+    /// Move constructor with allocator support
+    Point(const Point&& other, const allocator_type& alloc) 
+    : mMeasurement{std::move(other.mMeasurement), alloc},
+      mTimestamp{other.mTimestamp},
+      mTags{std::move(other.mTags), alloc},
+      mFields{std::move(other.mFields), alloc} { }
 
     /// Default destructor
     ~Point() = default;

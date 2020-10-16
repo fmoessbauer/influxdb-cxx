@@ -35,13 +35,13 @@
 
 namespace influxdb
 {
-    Point::Point(std::string_view measurement, std::pmr::memory_resource* pool)
-        : Point(measurement, getCurrentTimestamp(), pool) { }
+    Point::Point(std::string_view measurement, const allocator_type & alloc)
+        : Point(measurement, getCurrentTimestamp(), alloc) { }
 
-    Point::Point(std::string_view measurement, TimePoint tp, std::pmr::memory_resource * pool)
-        : mMeasurement(measurement, pool),
+    Point::Point(std::string_view measurement, TimePoint tp, const allocator_type & alloc)
+        : mMeasurement(measurement, alloc),
           mTimestamp(tp),
-          mTags(pool), mFields(pool)
+          mTags(alloc), mFields(alloc)
     {
     }
 

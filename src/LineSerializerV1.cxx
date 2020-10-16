@@ -18,9 +18,9 @@ namespace influxdb
         lineBuffer += " " + std::to_string(ns_since_epoch.count());
         lineBuffer += '\n';
     }
-    std::string&& LineSerializerV1::finalize_buffer()
+    std::string_view LineSerializerV1::finalize_buffer()
     {
-        return std::move(lineBuffer);
+        return lineBuffer;
     }
 
     void LineSerializerV1::append(const Point::TagContainer& tags)
@@ -54,5 +54,9 @@ namespace influxdb
                            [&](bool v) { lineBuffer += std::to_string(v); }},
                        field.second);
         }
+    }
+
+    void LineSerializerV1::reset() {
+        lineBuffer.clear();
     }
 }

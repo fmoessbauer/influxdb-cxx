@@ -50,7 +50,7 @@ class InfluxDB
     InfluxDB(const InfluxDB&) = delete;
 
     /// Constructor required valid transport
-    InfluxDB(std::unique_ptr<Transport> transport);
+    explicit InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializerV1> serializer);
 
     /// Flushes buffer
     ~InfluxDB();
@@ -59,9 +59,20 @@ class InfluxDB
     /// \param point
     void write(Point&& point);
 
+    void write(std::vector<Point> && points) {
+      write_batch(points);
+    }
+
     /// Writes a vector of point
     /// \param point
-    void write(std::vector<Point> &&points);
+    template<typename Container>
+    void write_batch(Container &&points) {
+      for (auto &&point : points) { 
+        point.accept(*v1serial);
+      }
+      mBatchCurSize += points.size();
+      flushBatch();
+    }
 
     /// Queries InfluxDB database
     std::vector<Point> query(const std::string& query);
@@ -80,27 +91,24 @@ class InfluxDB
 
     /// Enables points batching
     /// \param size
-    void batchOf(const std::size_t size = 32);
-
-    /// Transmits string over transport
-    void transmit(std::string&& point);
+    void batchOf(const std::size_t size = 32) { mBatchMaxSize = size; }
 
 private:
-    void addPointToBatch(Point &&point);
+    /// Transmits string over transport
+    void transmit(std::string_view serializedBatch);
 
   private:
-    /// all points of the current batch
-    std::vector<Point> mBatchedPoints;
+    /// Maximum number of points to batch
+    std::size_t mBatchMaxSize;
 
-    /// Flag stating whether point buffering is enabled
-    bool mIsBatchingActivated;
-
-    /// Points batch size
-    std::size_t mBatchSize;
+    /// Number of points in the current batch
+    std::size_t mBatchCurSize;
 
     /// Underlying transport UDP/HTTP/Unix socket
     std::unique_ptr<Transport> mTransport;
 
+    /// serializer instance
+    std::unique_ptr<LineSerializerV1> v1serial;
 };
 
 } // namespace influxdb

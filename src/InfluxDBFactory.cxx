@@ -32,6 +32,7 @@
 #include "UriParser.h"
 #include "HTTP.h"
 #include "InfluxDBException.h"
+#include "LineSerializerV1.h"
 
 #ifdef INFLUXDB_WITH_BOOST
 
@@ -102,7 +103,7 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
 
 std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)
 {
-  return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url));
+  return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url), std::make_unique<LineSerializerV1>());
 }
 
 } // namespace influxdb
