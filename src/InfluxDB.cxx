@@ -81,6 +81,10 @@ void InfluxDB::write(Point && point)
     }
 }
 
+void InfluxDB::write(const Point & point){
+  write(Point{point});
+}
+
 #ifdef INFLUXDB_WITH_BOOST
 
 std::vector<Point> InfluxDB::query(const std::string &query)

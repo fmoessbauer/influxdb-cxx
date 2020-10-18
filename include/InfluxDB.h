@@ -55,9 +55,12 @@ class InfluxDB
     /// Flushes buffer
     ~InfluxDB();
 
-    /// Writes a point
+    /// Writes a point (and takes ownership)
     /// \param point
     void write(Point&& point);
+
+    /// Writes a point (without taking ownership)
+    void write(const Point& point);
 
     void write(std::vector<Point> && points) {
       write_batch(points);
