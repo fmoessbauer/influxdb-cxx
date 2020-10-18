@@ -35,7 +35,7 @@
 
 #include "Transport.h"
 #include "Point.h"
-#include "LineSerializerV1.h"
+#include "LineSerializer.h"
 
 namespace influxdb
 {
@@ -50,7 +50,7 @@ class InfluxDB
     InfluxDB(const InfluxDB&) = delete;
 
     /// Constructor required valid transport
-    explicit InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializerV1> serializer);
+    explicit InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializer> serializer);
 
     /// Flushes buffer
     ~InfluxDB();
@@ -111,7 +111,7 @@ private:
     std::unique_ptr<Transport> mTransport;
 
     /// serializer instance
-    std::unique_ptr<LineSerializerV1> v1serial;
+    std::unique_ptr<LineSerializer> v1serial;
 };
 
 } // namespace influxdb

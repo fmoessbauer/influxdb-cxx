@@ -32,7 +32,7 @@ namespace influxdb::test {
 
 std::vector<std::string> getVector(const Point& point)
 {
-  LineSerializerV1 v1serial;
+  LineSerializer v1serial;
   point.accept(v1serial);
   // TODO: refactor
   std::string_view view = v1serial.finalize_buffer();

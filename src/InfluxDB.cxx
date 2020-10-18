@@ -42,7 +42,7 @@
 namespace influxdb
 {
 
-InfluxDB::InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializerV1> serializer)
+InfluxDB::InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializer> serializer)
   : mBatchMaxSize{1},
   mBatchCurSize{0},
   mTransport(std::move(transport)),
