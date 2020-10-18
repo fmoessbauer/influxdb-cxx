@@ -139,6 +139,7 @@ std::string HTTP::query(const std::string &query)
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
   response = curl_easy_perform(readHandle);
   curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
+  curl_free(encodedQuery);
   treatCurlResponse(response, responseCode);
   return buffer;
 }
