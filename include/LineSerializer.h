@@ -24,7 +24,7 @@ namespace influxdb
         }
 
         LineSerializer& operator=(const LineSerializer&) = delete;
-        LineSerializer& operator=(LineSerializer&&) = default;
+        LineSerializer& operator=(LineSerializer&&) = delete;
 
         /// serialize the point and append to buffer
         void visit(

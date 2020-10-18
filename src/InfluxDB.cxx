@@ -46,15 +46,17 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSer
   : mBatchMaxSize{1},
   mBatchCurSize{0},
   mTransport(std::move(transport)),
-  v1serial(std::move(serializer))
+  serial(std::move(serializer))
 {
 }
 
 InfluxDB::~InfluxDB()
 {
-  if (mBatchCurSize > 0)
-  {
+  try {
     flushBatch();
+  } catch(const InfluxDBException & e){
+    clearBatch();
+    throw InvalidApiUsage(__func__, "Terminate influxdb, but unsuccessfully send samples are in the buffer");
   }
 }
 
@@ -62,9 +64,8 @@ void InfluxDB::flushBatch()
 {
   if (mBatchCurSize > 0)
   {
-    transmit(v1serial->finalize_buffer());
-    v1serial->reset();
-    mBatchCurSize = 0;
+    transmit(serial->finalize_buffer());
+    clearBatch();
   }
 }
 
@@ -75,7 +76,7 @@ void InfluxDB::transmit(std::string_view serializedBatch)
 
 void InfluxDB::write(Point && point)
 {
-    point.accept(*v1serial);
+    point.accept(*serial);
     if(++mBatchCurSize >= mBatchMaxSize){
       flushBatch();
     }

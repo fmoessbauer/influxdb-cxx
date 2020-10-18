@@ -69,6 +69,7 @@ BOOST_AUTO_TEST_CASE(writeWrongHost)
 {
   auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost2:8086/?db=test");
   BOOST_CHECK_THROW(influxdb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
+  influxdb->clearBatch();
 }
 
 BOOST_AUTO_TEST_CASE(obtainDatabaseNameFromUrl)

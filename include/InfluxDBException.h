@@ -63,6 +63,11 @@ public:
   InvalidData(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
 };
 
+class InvalidApiUsage : public InfluxDBException {
+public:
+  InvalidApiUsage(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
+};
+
 
 } // namespace influxdb
 

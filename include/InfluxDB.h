@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 ///
-/// \author Adam Wegrzynek
+/// \authors Adam Wegrzynek, Felix Moessbauer
 ///
 
 #ifndef INFLUXDATA_INFLUXDB_H
@@ -55,26 +55,51 @@ class InfluxDB
     /// Flushes buffer
     ~InfluxDB();
 
-    /// Writes a point (and takes ownership)
-    /// \param point
+    /**
+     * \brief Writes a point (and takes ownership)
+     * \param point Point to consume
+     *
+     * \note In case of an exception, the function can be called again to send the same data.
+     *       If that is not intended, the user must call \ref clearBatch().
+     */
     void write(Point&& point);
 
-    /// Writes a point (without taking ownership)
+    /**
+     * \brief Writes a point (without taking ownership)
+     */
     void write(const Point& point);
 
     void write(std::vector<Point> && points) {
       write_batch(points);
     }
 
-    /// Writes a vector of point
-    /// \param point
+    /**
+     * \brief Writes a vector of point
+     * \param point Container with points
+     *
+     * \note sematics of this function are equal to calling \ref write with each point.
+     */
     template<typename Container>
     void write_batch(Container &&points) {
       for (auto &&point : points) { 
-        point.accept(*v1serial);
+        point.accept(*serial);
       }
       mBatchCurSize += points.size();
       flushBatch();
+    }
+
+    /**
+     * \brief clears the current send buffer
+     *
+     * In case of unsuccessful transmissions, we do not clear the buffer
+     * to give the user the option to inspect the error in the exception
+     * and try to re-submit the batch using \ref flushBatch().
+     *
+     * In case of successful transmissions, the buffer is cleared automatically.
+     */
+    void clearBatch() noexcept {
+      serial->reset();
+      mBatchCurSize = 0;
     }
 
     /// Queries InfluxDB database
@@ -83,14 +108,13 @@ class InfluxDB
     /// Create InfluxDB database if does not exists
     void createDatabaseIfNotExists();
 
-    /// Flushes points batched (this can also happens when buffer is full)
+    /**
+     * \brief Flushes points batched (this can also happens when buffer is full)
+     *
+     * \note In case of an exception, the function can be called again to send the same data.
+     *       If that is not intended, the user must call \ref clearBatch().
+     */
     void flushBatch();
-
-    /// \deprecated use \ref flushBatch() instead
-    inline void flushBuffer()
-    {
-        flushBatch();
-    }
 
     /// Enables points batching
     /// \param size
@@ -111,7 +135,7 @@ private:
     std::unique_ptr<Transport> mTransport;
 
     /// serializer instance
-    std::unique_ptr<LineSerializer> v1serial;
+    std::unique_ptr<LineSerializer> serial;
 };
 
 } // namespace influxdb

@@ -32,10 +32,10 @@ namespace influxdb::test {
 
 std::vector<std::string> getVector(const Point& point)
 {
-  LineSerializer v1serial;
-  point.accept(v1serial);
+  LineSerializer serial;
+  point.accept(serial);
   // TODO: refactor
-  std::string_view view = v1serial.finalize_buffer();
+  std::string_view view = serial.finalize_buffer();
   std::istringstream result(std::string(view), std::ios_base::in);
 
   return std::vector<std::string>{std::istream_iterator<std::string>{result},
