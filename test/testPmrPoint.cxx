@@ -6,6 +6,7 @@
 #include <memory_resource>
 
 #include "Point.h"
+#include "LineSerializerV1.h"
 
 #define PRINT_SIZES
 #ifdef PRINT_SIZES
@@ -44,5 +45,23 @@ namespace influxdb::test
                 .addTag("class", "major")
                 .addField("value", 10LL),
             std::bad_alloc);
+    }
+
+    BOOST_AUTO_TEST_CASE(SerializeToV1)
+    {
+        LineSerializerV1 serial;
+        {
+            Point point{"test", std::chrono::system_clock::time_point{}};
+            point.addTag("type", "voltage")
+                    .addTag("class", "major")
+                    .addField("value", 10LL);
+
+            point.accept(serial);
+            BOOST_CHECK_EQUAL(
+                serial.finalize_buffer(), "test,class=major,type=voltage value=10i 0\n"
+            );
+        }
+        serial.reset();
+        BOOST_CHECK_EQUAL(serial.finalize_buffer(), "");
     }
 } // namespace influxdb::test
