@@ -40,7 +40,7 @@ class HTTP : public Transport
 {
 public:
   /// Constructor
-  explicit HTTP(const std::string &url);
+  explicit HTTP(std::string_view url);
 
   /// Default destructor
   ~HTTP() override;
@@ -51,7 +51,7 @@ public:
 
   /// Queries database
   /// \throw InfluxDBException	when CURL GET fails
-  std::string query(const std::string &query) override;
+  std::string query(std::string_view query) override;
 
   /// Creates database used at url if it does not exists
   /// \throw InfluxDBException	when CURL POST fails
@@ -59,7 +59,7 @@ public:
 
   /// Enable Basic Auth
   /// \param auth <username>:<password>
-  void enableBasicAuth(const std::string &auth);
+  void enableBasicAuth(std::string_view auth);
 
   /// Get the database name managed by this transport
   [[nodiscard]] std::string databaseName() const;
@@ -70,17 +70,17 @@ public:
 private:
 
   /// Obtain InfluxDB service url from the url passed
-  void obtainInfluxServiceUrl(const std::string &url);
+  void obtainInfluxServiceUrl(std::string_view url);
 
   /// Obtain database name from the url passed
-  void obtainDatabaseName(const std::string &url);
+  void obtainDatabaseName(std::string_view url);
 
   /// Initilizes CURL for writting and common options
   /// \throw InfluxDBException	if database (?db=) not specified
-  void initCurl(const std::string &url);
+  void initCurl(std::string_view url);
 
   /// Initializes CURL for reading
-  void initCurlRead(const std::string &url);
+  void initCurlRead(std::string_view url);
 
   /// treats responses of CURL requests
   void treatCurlResponse(const CURLcode &response, long responseCode) const;
@@ -91,6 +91,8 @@ private:
   /// CURL pointer configured for querying
   CURL *readHandle;
 
+  /// basic authentification password
+  std::string mAuthPasswd;
   /// InfluxDB read URL
   std::string mReadUrl;
 

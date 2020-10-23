@@ -73,7 +73,7 @@ namespace influxdb::transports
         }
     }
 
-HTTP::HTTP(const std::string &url)
+HTTP::HTTP(std::string_view url)
 {
   initCurl(url);
   initCurlRead(url);
@@ -88,7 +88,7 @@ HTTP::~HTTP()
   curl_global_cleanup();
 }
 
-void HTTP::initCurl(const std::string &url)
+void HTTP::initCurl(std::string_view url)
 {
   CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL);
   if (globalInitResult != CURLE_OK)
@@ -96,7 +96,7 @@ void HTTP::initCurl(const std::string &url)
     throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
   }
 
-  std::string writeUrl = url;
+  std::string writeUrl = std::string(url);
   auto position = writeUrl.find('?');
   if (position == std::string::npos)
   {
@@ -113,9 +113,9 @@ void HTTP::initCurl(const std::string &url)
   writeHandle = createWriteHandle(writeUrl);
 }
 
-void HTTP::initCurlRead(const std::string &url)
+void HTTP::initCurlRead(std::string_view url)
 {
-  mReadUrl = url + "&q=";
+  mReadUrl = std::string(url) + "&q=";
   const auto pos = mReadUrl.find('?');
   std::string cmd{"query"};
 
@@ -128,12 +128,12 @@ void HTTP::initCurlRead(const std::string &url)
   readHandle = createReadHandle();
 }
 
-std::string HTTP::query(const std::string &query)
+std::string HTTP::query(std::string_view query)
 {
   CURLcode response;
   long responseCode;
   std::string buffer;
-  char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), static_cast<int>(query.size()));
+  char* encodedQuery = curl_easy_escape(readHandle, query.data(), static_cast<int>(query.size()));
   auto fullUrl = mReadUrl + std::string(encodedQuery);
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
@@ -144,12 +144,13 @@ std::string HTTP::query(const std::string &query)
   return buffer;
 }
 
-void HTTP::enableBasicAuth(const std::string &auth)
+void HTTP::enableBasicAuth(std::string_view auth)
 {
+  mAuthPasswd = std::string(auth);
   curl_easy_setopt(writeHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  curl_easy_setopt(writeHandle, CURLOPT_USERPWD, auth.c_str());
+  curl_easy_setopt(writeHandle, CURLOPT_USERPWD, mAuthPasswd.c_str());
   curl_easy_setopt(readHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  curl_easy_setopt(readHandle, CURLOPT_USERPWD, auth.c_str());
+  curl_easy_setopt(readHandle, CURLOPT_USERPWD, mAuthPasswd.c_str());
 }
 
 void HTTP::send(std::string_view lineprotocol)
@@ -187,7 +188,7 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
   }
 }
 
-void HTTP::obtainInfluxServiceUrl(const std::string &url)
+void HTTP::obtainInfluxServiceUrl(std::string_view url)
 {
   auto questionMarkPosition = url.find('?');
   if (url.at(questionMarkPosition - 1) == '/')
@@ -200,7 +201,7 @@ void HTTP::obtainInfluxServiceUrl(const std::string &url)
   }
 }
 
-void HTTP::obtainDatabaseName(const std::string &url)
+void HTTP::obtainDatabaseName(std::string_view url)
 {
   auto dbParameterPosition = url.find("db=");
   mDatabaseName = url.substr(dbParameterPosition + 3);

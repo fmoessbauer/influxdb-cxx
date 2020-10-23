@@ -103,7 +103,7 @@ class InfluxDB
     }
 
     /// Queries InfluxDB database
-    std::vector<Point> query(const std::string& query);
+    std::vector<Point> query(std::string_view query);
 
     /// Create InfluxDB database if does not exists
     void createDatabaseIfNotExists();

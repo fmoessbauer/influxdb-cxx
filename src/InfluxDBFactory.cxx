@@ -77,7 +77,7 @@ std::unique_ptr<Transport> withHttpTransport(const http::url &uri)
   return transport;
 }
 
-std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
+std::unique_ptr<Transport> InfluxDBFactory::GetTransport(std::string_view url)
 {
   static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url &)>> map = {
     {"udp",   withUdpTransport},
@@ -102,7 +102,7 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
   return iterator->second(parsedUrl);
 }
 
-std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, const std::pmr::polymorphic_allocator<char> & alloc)
+std::unique_ptr<InfluxDB> InfluxDBFactory::Get(std::string_view url, const std::pmr::polymorphic_allocator<char> & alloc)
 {
   return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url), std::make_unique<LineSerializerPMR>(alloc));
 }

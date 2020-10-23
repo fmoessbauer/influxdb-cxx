@@ -41,7 +41,7 @@ class UDP : public Transport
 {
   public:
     /// Constructor
-    UDP(const std::string &hostname, int port);
+    UDP(std::string_view hostname, int port);
 
     /// Sends blob via UDP
     void send(std::string_view message) override;

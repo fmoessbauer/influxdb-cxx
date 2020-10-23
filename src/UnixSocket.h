@@ -39,7 +39,7 @@ namespace influxdb::transports
 class UnixSocket : public Transport
 {
   public:
-    explicit UnixSocket(const std::string &socketPath);
+    explicit UnixSocket(std::string_view socketPath);
 
     /// \param message   r-value string formated
     void send(std::string_view message) override;

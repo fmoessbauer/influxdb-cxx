@@ -88,7 +88,7 @@ void InfluxDB::write(const Point & point){
 
 #ifdef INFLUXDB_WITH_BOOST
 
-std::vector<Point> InfluxDB::query(const std::string &query)
+std::vector<Point> InfluxDB::query(std::string_view query)
 {
   auto response = mTransport->query(query);
   std::stringstream responseString;

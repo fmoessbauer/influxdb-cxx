@@ -47,11 +47,11 @@ class InfluxDBFactory
    /// Provides InfluxDB instance with given transport
    /// \param url 	URL defining transport details
    /// \throw InfluxDBException 	if unrecognised backend or missing protocol
-   static std::unique_ptr<InfluxDB> Get(const std::string& url, const std::pmr::polymorphic_allocator<char> & alloc = {}) noexcept(false);
+   static std::unique_ptr<InfluxDB> Get(std::string_view url, const std::pmr::polymorphic_allocator<char> & alloc = {}) noexcept(false);
 
  private:
    ///\return  backend based on provided URL
-   static std::unique_ptr<Transport> GetTransport(const std::string& url);
+   static std::unique_ptr<Transport> GetTransport(std::string_view url);
 
    /// Private constructor disallows to create instance of Factory
    InfluxDBFactory() = default;

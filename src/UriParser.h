@@ -80,7 +80,8 @@ namespace http {
 
 
     //--- Public Interface -------------------------------------------------------------~
-    static inline url ParseHttpUrl(std::string &in) {
+    static inline url ParseHttpUrl(std::string_view input_url) {
+        std::string in(input_url);
         const auto url = in;
         const auto protocol = ExtractProtocol(in);
         const auto search = ExtractSearch(in);
