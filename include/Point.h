@@ -22,6 +22,7 @@
 
 ///
 /// \author Adam Wegrzynek
+/// \author Felix Moessbauer
 ///
 
 #ifndef INFLUXDATA_POINT_H

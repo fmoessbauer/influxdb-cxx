@@ -22,6 +22,7 @@
 
 ///
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
+/// \author Felix Moessbauer
 ///
 
 #ifndef INFLUXDATA_EXCEPTION_H

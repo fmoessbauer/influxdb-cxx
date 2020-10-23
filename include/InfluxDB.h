@@ -21,7 +21,8 @@
 // SOFTWARE.
 
 ///
-/// \authors Adam Wegrzynek, Felix Moessbauer
+/// \author Adam Wegrzynek
+/// \author Felix Moessbauer
 ///
 
 #ifndef INFLUXDATA_INFLUXDB_H

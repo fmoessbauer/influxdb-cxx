@@ -17,13 +17,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef INFLUXDATA_HTTPPARSER_H
-#define INFLUXDATA_HTTPPARSER_H
-
+#pragma once
 #include <iostream>
 #include <string>
 #include <stdlib.h>
 
+///
+/// \author Covenant Eyes
+/// \author Felix Moessbauer
+///
 
 namespace http {
     struct url {
@@ -95,4 +97,3 @@ namespace http {
         return {protocol, user, password, host, path, search, url, port};
     }
 }
-#endif
