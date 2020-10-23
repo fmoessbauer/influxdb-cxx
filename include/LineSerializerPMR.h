@@ -13,8 +13,7 @@ namespace influxdb
 
     public:
         explicit LineSerializerPMR(const allocator_type& alloc = {})
-            : monoBuf{alloc.resource()},
-              lineBuffer{&monoBuf}
+            : lineBuffer{alloc}
         {
         }
 
@@ -46,7 +45,6 @@ namespace influxdb
         void append(const Point::FieldContainer& fields);
 
     private:
-        std::pmr::monotonic_buffer_resource monoBuf;
         std::pmr::string lineBuffer;
     };
 }

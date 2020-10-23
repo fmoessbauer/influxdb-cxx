@@ -15,6 +15,7 @@ namespace influxdb::test
         template <typename Container>
         void printBuffer(const Container& container)
         {
+            std::cout << "Buffer:" << std::endl;
             std::for_each(container.begin(), container.end(), [](auto c) {
                 if (c == 0)
                     std::cout << ".";
@@ -25,11 +26,17 @@ namespace influxdb::test
             });
             std::cout << std::endl;
         }
+
+        void printPoolOpts(const std::pmr::pool_options& opts){
+            std::cout << "max_blocks_per_chunk:        " << opts.max_blocks_per_chunk << std::endl;
+            std::cout << "largest_required_pool_block: " << opts.largest_required_pool_block << std::endl;
+        }
     }
 
     BOOST_AUTO_TEST_CASE(NoAllocOnHotPath)
     {
         std::pmr::unsynchronized_pool_resource pool{};
+        printPoolOpts(pool.options());
 
         auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test", &pool);
         BOOST_CHECK_NO_THROW(influxdb->createDatabaseIfNotExists());
@@ -48,7 +55,6 @@ namespace influxdb::test
                 influxdb->write(Point{"test", &mono}.addTag("str_value", "P2").addTag("tag", "VeryLongTagWithoutSSO").addField("value", 43)));
             BOOST_CHECK_NO_THROW(influxdb->flushBatch());
 
-            std::cout << "Buffer:" << std::endl;
             printBuffer(pointBuffer);
         }
 

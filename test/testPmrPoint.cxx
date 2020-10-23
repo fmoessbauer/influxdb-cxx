@@ -49,7 +49,9 @@ namespace influxdb::test
 
     BOOST_AUTO_TEST_CASE(SerializeToV1)
     {
-        LineSerializerPMR serial;
+        std::vector<unsigned char> buffer(500);
+        std::pmr::monotonic_buffer_resource pool{buffer.data(), buffer.size(), std::pmr::null_memory_resource()};
+        LineSerializerPMR serial{&pool};
         {
             Point point{"test", std::chrono::system_clock::time_point{}};
             point.addTag("type", "voltage")
