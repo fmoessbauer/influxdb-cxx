@@ -136,11 +136,11 @@ std::string HTTP::query(std::string_view query)
   std::string buffer;
   char* encodedQuery = curl_easy_escape(readHandle, query.data(), static_cast<int>(query.size()));
   auto fullUrl = mReadUrl + std::string(encodedQuery);
+  curl_free(encodedQuery);
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
   response = curl_easy_perform(readHandle);
   curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
-  curl_free(encodedQuery);
   treatCurlResponse(response, responseCode);
   return buffer;
 }

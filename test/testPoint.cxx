@@ -43,7 +43,7 @@ std::vector<std::string> getVector(const Point& point)
                       std::istream_iterator<std::string>{}};
 }
 
-BOOST_AUTO_TEST_CASE(test1)
+BOOST_AUTO_TEST_CASE(measurementWithValue)
 {
   auto point = Point{"test"}
     .addField("value", 10LL);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test1)
   BOOST_CHECK_EQUAL(result[1], "value=10i");
 }
 
-BOOST_AUTO_TEST_CASE(test2)
+BOOST_AUTO_TEST_CASE(multipleFields)
 {
   auto point = Point{"test"}
     .addField("value", 10LL)
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(test2)
   BOOST_CHECK_EQUAL(result[1], "dvalue="+std::to_string(10.1)+",value=10i");
 }
 
-BOOST_AUTO_TEST_CASE(test3)
+BOOST_AUTO_TEST_CASE(multipleFieldsWithTag)
 {
   auto point = Point{"test"}
     .addField("value", 10LL)
@@ -81,7 +81,29 @@ BOOST_AUTO_TEST_CASE(test3)
   BOOST_CHECK_EQUAL(result[1], "dvalue="+std::to_string(10.1)+",value=10i");
 }
 
-BOOST_AUTO_TEST_CASE(test4)
+BOOST_AUTO_TEST_CASE(emptyTagValueIsNotAdded)
+{
+  auto ts = std::chrono::system_clock::now();
+  auto point = Point{"test", ts}
+    .addField("value", 2)
+    .addTag("tag", "");
+  LineSerializerPMR serial;
+  point.accept(serial);
+  auto buffer = serial.finalize_buffer();
+  const uint64_t ns_since_epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(ts.time_since_epoch()).count();
+  std::string actual(buffer);
+  std::string expected("test value=2i "+ std::to_string(ns_since_epoch)+"\n");
+  BOOST_TEST(actual == expected);
+}
+
+BOOST_AUTO_TEST_CASE(emptyTagKeyIsNotAdded)
+{
+  BOOST_REQUIRE_THROW(Point{"test"}
+    .addField("value", 2)
+    .addTag("", "xyz"), InvalidData);
+}
+
+BOOST_AUTO_TEST_CASE(timestamp)
 {
   auto point = Point{"test"}
     .addField("value", 10)
@@ -99,7 +121,15 @@ BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
 
   BOOST_CHECK_EQUAL(point.viewFields().size(), 0);
 }
+
+BOOST_AUTO_TEST_CASE(emptyTagReturnsEmpty)
+{
+    const auto & tags = Point{"x"}.viewTags();
+    BOOST_CHECK(tags.begin() == tags.end());
+}
+
 #if 0
+
 BOOST_AUTO_TEST_CASE(floatFieldsPrecisionCanBeAdjusted)
 {
   //Point::floatsPrecision = 3;
