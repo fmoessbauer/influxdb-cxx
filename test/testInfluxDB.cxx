@@ -29,6 +29,7 @@
 #include "HTTP.h"
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
+#include "LineSerializerPMR.h"
 
 namespace influxdb::test
 {
@@ -164,7 +165,7 @@ namespace influxdb::test
     BOOST_AUTO_TEST_CASE(pointsWrittenAsBatchAreTransmittedInBatchesSpecified)
     {
         auto recorder = std::make_shared<WriteRecorder>();
-        InfluxDB db{std::make_unique<TransportAdapter>(recorder), std::make_unique<LineSerializer>()};
+        InfluxDB db{std::make_unique<TransportAdapter>(recorder), std::make_unique<LineSerializerPMR>()};
         db.batchOf(2);
 
         db.write(Point{"batch_point"}.addField("value", 0).addTag("host", "localhost"));

@@ -1,4 +1,4 @@
-#include "LineSerializer.h"
+#include "LineSerializerPMR.h"
 #include "Point.h"
 #include <chrono>
 
@@ -9,7 +9,7 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 namespace influxdb
 {
-    void LineSerializer::visit(const Point& point)
+    void LineSerializerPMR::visit(const Point& point)
     {
         const auto ns_since_epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch());
         lineBuffer += point.viewName();
@@ -18,12 +18,12 @@ namespace influxdb
         lineBuffer += " " + std::to_string(ns_since_epoch.count());
         lineBuffer += '\n';
     }
-    std::string_view LineSerializer::finalize_buffer()
+    std::string_view LineSerializerPMR::finalize_buffer()
     {
         return lineBuffer;
     }
 
-    void LineSerializer::append(const Point::TagContainer& tags)
+    void LineSerializerPMR::append(const Point::TagContainer& tags)
     {
         for (const auto& tag : tags)
         {
@@ -34,7 +34,7 @@ namespace influxdb
         }
     }
 
-    void LineSerializer::append(const Point::FieldContainer& fields)
+    void LineSerializerPMR::append(const Point::FieldContainer& fields)
     {
         if (!fields.empty())
             lineBuffer += ' ';
@@ -56,7 +56,7 @@ namespace influxdb
         }
     }
 
-    void LineSerializer::reset() {
+    void LineSerializerPMR::reset() {
         lineBuffer.clear();
     }
 }

@@ -26,13 +26,14 @@
 
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
+#include "LineSerializerPMR.h"
 #include <iterator>
 
 namespace influxdb::test {
 
 std::vector<std::string> getVector(const Point& point)
 {
-  LineSerializer serial;
+  LineSerializerPMR serial;
   point.accept(serial);
   // TODO: refactor
   std::string_view view = serial.finalize_buffer();

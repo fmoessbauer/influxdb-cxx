@@ -6,7 +6,7 @@
 #include <memory_resource>
 
 #include "Point.h"
-#include "LineSerializer.h"
+#include "LineSerializerPMR.h"
 
 #define PRINT_SIZES
 #ifdef PRINT_SIZES
@@ -49,7 +49,7 @@ namespace influxdb::test
 
     BOOST_AUTO_TEST_CASE(SerializeToV1)
     {
-        LineSerializer serial;
+        LineSerializerPMR serial;
         {
             Point point{"test", std::chrono::system_clock::time_point{}};
             point.addTag("type", "voltage")

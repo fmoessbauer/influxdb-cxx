@@ -50,7 +50,7 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSer
 {
 }
 
-InfluxDB::~InfluxDB()
+InfluxDB::~InfluxDB() noexcept(false)
 {
   try {
     flushBatch();

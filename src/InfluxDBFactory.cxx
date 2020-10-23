@@ -29,10 +29,11 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <memory_resource>
 #include "UriParser.h"
 #include "HTTP.h"
 #include "InfluxDBException.h"
-#include "LineSerializer.h"
+#include "LineSerializerPMR.h"
 
 #ifdef INFLUXDB_WITH_BOOST
 
@@ -101,9 +102,9 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
   return iterator->second(parsedUrl);
 }
 
-std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)
+std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, const std::pmr::polymorphic_allocator<char> & alloc)
 {
-  return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url), std::make_unique<LineSerializer>());
+  return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url), std::make_unique<LineSerializerPMR>(alloc));
 }
 
 } // namespace influxdb

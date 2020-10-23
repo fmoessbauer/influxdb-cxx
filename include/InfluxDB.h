@@ -53,7 +53,7 @@ class InfluxDB
     explicit InfluxDB(std::unique_ptr<Transport> transport, std::unique_ptr<LineSerializer> serializer);
 
     /// Flushes buffer
-    ~InfluxDB();
+    ~InfluxDB() noexcept(false);
 
     /**
      * \brief Writes a point (and takes ownership)

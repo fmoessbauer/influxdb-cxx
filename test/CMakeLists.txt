@@ -6,6 +6,7 @@
     testQuery.cxx
     testFactory.cxx
     testInfluxDB.cxx
+    testPmrInfluxDB.cxx
   )
 
   foreach (test ${TEST_SRCS})
