@@ -55,7 +55,7 @@ InfluxDB::~InfluxDB() noexcept(false)
 {
   try {
     flushBatch();
-  } catch(const InfluxDBException & e){
+  } catch(const InfluxDBException &){
     clearBatch();
     throw InvalidApiUsage(__func__, "Terminate influxdb, but unsuccessfully send samples are in the buffer");
   }
@@ -151,7 +151,7 @@ void InfluxDB::createDatabaseIfNotExists()
 }
 
 #else
-std::vector<Point> InfluxDB::query(const std::string& /*query*/)
+std::vector<Point> InfluxDB::query(std::string_view /*query*/)
 {
   throw InfluxDBException("InfluxDB::query", "Boost is required");
 }

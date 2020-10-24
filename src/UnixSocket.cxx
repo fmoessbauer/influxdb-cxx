@@ -53,12 +53,12 @@ void UnixSocket::send(std::string_view message)
 
 #else
 
-UnixSocket::UnixSocket(const std::string&)
+UnixSocket::UnixSocket(std::string_view)
 {
   throw InfluxDBException{__func__, "Unix socket not supported on this system"};
 }
 
-void UnixSocket::send(std::string&&)
+void UnixSocket::send(std::string_view)
 {
   throw InfluxDBException{__func__, "Unix socket not supported on this system"};
 }
