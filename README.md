@@ -41,6 +41,19 @@ brew install awegrzyn/influxdata/influxdb-cxx
 
 ## Quick start
 
+### Include in CMake project
+
+The InfluxDB library is exported as target `InfluxData::InfluxDB`.
+
+```cmake
+project(test)
+
+find_package(InfluxDB)
+
+add_executable(test main)
+target_link_libraries(test PRIVATE InfluxData::InfluxDB)
+```
+
 ### Basic write
 
 ```cpp
