@@ -29,10 +29,11 @@
 #include "Point.h"
 #include <string>
 #include <memory_resource>
+#include "influxdb_export.h"
 
 namespace influxdb
 {
-    class LineSerializerPMR : public LineSerializer
+    class INFLUXDB_EXPORT LineSerializerPMR : public LineSerializer
     {
     public:
         using allocator_type = std::pmr::polymorphic_allocator<char>;

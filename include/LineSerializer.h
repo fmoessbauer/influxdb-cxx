@@ -27,13 +27,14 @@
 #pragma once
 #include "Point.h"
 #include <string>
+#include "influxdb_export.h"
 
 namespace influxdb
 {
     /**
      * \brief Interface of the LineSerializer
      */
-    class LineSerializer {
+    class INFLUXDB_EXPORT LineSerializer {
         public:
         virtual ~LineSerializer() {}
 

@@ -35,11 +35,13 @@
 #include <variant>
 #include <memory_resource>
 
+#include "influxdb_export.h"
+
 namespace influxdb
 {
 
 /// \brief Represents a point
-class Point
+class INFLUXDB_EXPORT Point
 {
 public:
     using FieldValue = std::variant<int, long long int, std::string, double, bool>;
