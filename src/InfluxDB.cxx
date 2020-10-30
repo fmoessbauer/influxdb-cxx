@@ -102,7 +102,9 @@ std::vector<Point> InfluxDB::query(std::string_view query)
   {
     auto isResultEmpty = result.second.find("series");
     if (isResultEmpty == result.second.not_found())
-    { return {}; }
+    {
+        return {};
+    }
     for (auto &series : result.second.get_child("series"))
     {
       auto columns = series.second.get_child("columns");
@@ -127,9 +129,13 @@ std::vector<Point> InfluxDB::query(std::string_view query)
           }
           // cast all values to double, if strings add to tags
           try
-          { point.addField(column, boost::lexical_cast<double>(value)); }
+          {
+              point.addField(column, boost::lexical_cast<double>(value));
+          }
           catch (...)
-          { point.addTag(column, value); }
+          {
+              point.addTag(column, value);
+          }
         }
         points.push_back(std::move(point));
       }

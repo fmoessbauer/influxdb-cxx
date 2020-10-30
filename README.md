@@ -46,20 +46,20 @@ brew install awegrzyn/influxdata/influxdb-cxx
 The InfluxDB library is exported as target `InfluxData::InfluxDB`.
 
 ```cmake
-project(test)
+project(example)
 
 find_package(InfluxDB)
 
-add_executable(test main)
-target_link_libraries(test PRIVATE InfluxData::InfluxDB)
+add_executable(example-influx main.cpp)
+target_link_libraries(example-influx PRIVATE InfluxData::InfluxDB)
 ```
 
 ### Basic write
 
 ```cpp
 // Provide complete URI
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
-influxdb->write(Point{"test"}
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+influxdb->write(influxdb::Point{"test"}
   .addField("value", 10)
   .addTag("host", "localhost")
 );
@@ -69,12 +69,12 @@ influxdb->write(Point{"test"}
 
 ```cpp
 // Provide complete URI
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 // Write batches of 100 points
 influxdb->batchOf(100);
 
 for (;;) {
-  influxdb->write(Point{"test"}.addField("value", 10));
+  influxdb->write(influxdb::Point{"test"}.addField("value", 10));
 }
 ```
 
@@ -82,22 +82,22 @@ for (;;) {
 
 ```cpp
 // Available over HTTP only
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 /// Pass an IFQL to get list of points
-std::vector<Point> points = idb->query("SELECT * FROM test");
+std::vector<influxdb::Point> points = idb->query("SELECT * FROM test");
 ```
 
 ## Transports
 
 An underlying transport is fully configurable by passing an URI:
 ```
-[protocol]://[username:password@]host:port[/?db=database]
+[protocol]://[username:password@]host:port[?db=database]
 ```
 <br>
 List of supported transport is following:
 
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
-| HTTP        | cURL        | `http`/`https` | `http://localhost:8086/?db=<db>`      |
+| HTTP        | cURL        | `http`/`https` | `http://localhost:8086?db=<db>`      |
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
