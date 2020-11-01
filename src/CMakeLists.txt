@@ -36,3 +36,11 @@ target_compile_definitions(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
 )
+
+# for packaging, avoid uppercase library names
+# we currently do not track ABI compability,
+# hence always assume an ABI break on a
+# new (not patchonly version)
+set_target_properties(InfluxDB PROPERTIES
+  OUTPUT_NAME influxdb-cxx
+  VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
