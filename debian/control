@@ -1,0 +1,33 @@
+Source: influxdb-cxx
+Section: libdevel
+Priority: optional
+Maintainer: Felix Moessbauer <felix.moessbauer@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ libboost-system-dev
+Standards-Version: 4.5.0
+Vcs-Browser: https://github.com/offa/influxdb-cxx
+Vcs-Git: https://github.com/offa/influxdb-cxx.git
+Rules-Requires-Root: no
+
+Package: libinfluxdb-cxx-dev
+Architecture: any
+Multi-Arch: same
+Depends:
+ libinfluxdb-cxx0.7 (= ${binary:Version}),
+ libcurl4-openssl-dev | libcurl4-gnutls-dev,
+ libboost-system-dev,
+ ${misc:Depends}
+Description: C++ library to writer data into an InfluxDB.
+ This is the development version of the library.
+
+Package: libinfluxdb-cxx0.7
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: C++ library to writer data into an InfluxDB.
+ This is the compiled version of the library.
+

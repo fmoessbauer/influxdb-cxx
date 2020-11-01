@@ -1,0 +1,3 @@
+usr/include/
+usr/lib*/*/libinfluxdb-cxx.so
+usr/lib*/*/cmake/

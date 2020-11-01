@@ -1,0 +1,5 @@
+influxdb-cxx (0.7.0-1ubuntu2) groovy; urgency=medium
+
+  * Initial release
+
+ -- Felix Moessbauer <felix.moessbauer@gmail.com>  Sun, 01 Nov 2020 16:24:12 +0100
