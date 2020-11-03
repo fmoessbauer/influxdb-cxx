@@ -61,7 +61,7 @@ namespace influxdb::test
         std::cout << "SSO size:                " << std::pmr::string{}.capacity() << std::endl;
 #endif
 
-        auto point = Point{"test", &pool};        
+        auto point = Point{"test", &pool};
         BOOST_REQUIRE_THROW(
             point.addTag("type", "voltage")
                 .addTag("class", "major")

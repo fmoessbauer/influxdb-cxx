@@ -83,7 +83,7 @@ class INFLUXDB_EXPORT InfluxDB
      */
     template<typename Container>
     void write_batch(Container &&points) {
-      for (auto &&point : points) { 
+      for (auto &&point : points) {
         point.accept(*serial);
       }
       mBatchCurSize += points.size();
