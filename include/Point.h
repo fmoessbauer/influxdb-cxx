@@ -37,6 +37,8 @@
 
 #include "influxdb_export.h"
 
+#include "influxdb_export.h"
+
 namespace influxdb
 {
 
